@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trial/model/user.dart';
 import 'package:trial/services/database_handler.dart';
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -48,8 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     this.handler = DatabaseHandler();
     this.handler.initializeDB().whenComplete(() async {
-      await this.addUsers();
-      setState(() {});
+      print("initialized");
     });
   }
 
@@ -132,6 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                       return null;
                     },
+                    keyboardType: TextInputType.number,
                     controller: ageController,
                     decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
@@ -201,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         name = nameController.text;
                         age = ageController.text;
@@ -212,7 +213,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       // this.handler.insertdata(User(
                       //     id: 0, name: '', age: 0, country: '', email: '')); //failed
                       // this.handler.insertUser(User(age: 0, country: '', name: ''));
-                      addUsers();
+                      var re = await addUsers();
+                      print(re);
                       // this.handler.insertUser(listOfUser);
                     },
                     child: Text('Add')),
@@ -277,11 +279,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<int> addUsers() async {
-    User firstUser =
-        User(name: "peter", age: 24, country: "Lebanon", email: "abc");
-    User secondUser =
-        User(name: "john", age: 31, country: "United Kingdom", email: "xyz");
-    List<User> listOfUsers = [firstUser, secondUser];
+    User firstUser = User(
+      name: name,
+      age: int.parse(age),
+      country: country,
+      email: email,
+    );
+
+    List<User> listOfUsers = [firstUser];
+    print(listOfUsers);
     return await this.handler.insertUser(listOfUsers);
   }
 }
